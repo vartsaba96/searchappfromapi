@@ -23,13 +23,19 @@ export const findPersonsByName = (formElement) => {
     return {
         type: "FIND_BY_NAME",
         payload: formElement
-            }
+    }
 }
 
 export const findPersonsByAge = (formElement) => {
     return {
         type: "FIND_BY_AGE",
         payload: formElement
-            }
+    }
 }
 
+export const findPersonsBySex = (formElement) => {
+    return {
+        type: "FIND_BY_SEX",
+        payload: formElement
+    }
+}

@@ -1,78 +1,84 @@
 import React, { Component } from 'react';
 import './App.css';
 import { connect } from "react-redux";
-import { getPersons, findPersonsByName,findPersonsByAge } from './actions/actions';
-
+import {
+  getPersons,
+  findPersonsByName,
+  findPersonsByAge,
+  findPersonsBySex
+} from './actions/actions';
+import Search from './component/Search';
 
 class App extends Component {
   constructor(props) {
     super(props);
-    this.onHandleFind = this.onHandleFind.bind(this);
+    this.onHandleFindName = this.onHandleFindName.bind(this);
+    this.onHandleFindAge = this.onHandleFindAge.bind(this);
+    this.onHandleFindSex = this.onHandleFindSex.bind(this);
   };
+
   componentDidMount() {
     this.props.getData("https://venbest-test.herokuapp.com/")
   }
 
-
-  onHandleFind(e) {
-    this.props.onFind({ value: e.target.value, name: e.target.name });
+  onHandleFindName(e) {
+    this.props.onFindName(e.target.value);
   }
 
+  onHandleFindAge(e) {
+    this.props.onFindAge(e.target.value);
+  }
+
+  onHandleFindSex(e) {
+    this.props.onFindSex(e.target.value);
+  }
 
   render() {
-
     return (
-
       <div className="App">
-        <div>
-          <form>
-            <input name="nameValue" type="text" onChange={this.onHandleFind} />
-            <input name="ageValue" type="number" onChange={this.onHandleFind} />
-
-          </form>
-        </div>
-      { this.props.filterPersons ?
-        <ul>{this.props.filterPersons.map((person, index) => {
-          return <li key={index}>
-            <div>{person.name} {person.lastname}</div>
-            <div>Возраст: {person.age}</div>
-            <div>Пол: {person.sex}</div>
-          </li>
-        })}
-
-        </ul>:
-        <div>Loading....</div>
-      }
-
+        <Search onHandleFindName={this.onHandleFindName} onHandleFindAge={this.onHandleFindAge}
+          selectedOption={this.props.selectedOption} onHandleFindSex={this.onHandleFindSex} />
+        {this.props.listPersons ?
+          <ul>{this.props.listPersons.map((person, index) => {
+            return <li key={index}>
+              <div>{person.name} {person.lastname}</div>
+              <div>Возраст: {person.age}</div>
+              <div>Пол: {person.sex}</div>
+              <hr></hr>
+            </li>
+          })}
+          </ul> :
+          <div>Loading....</div>
+        }
       </div>
     );
   }
 }
 
 const mapStateToProps = state => {
+  const commontNameAndAge = commonFromTwoArrays(state.persons.filterPersonsByName, state.persons.filterPersonsByAge);
   return {
-    persons: state.persons.persons,
-    nameValue: state.persons.nameValue,
-    filterPersons: [...state.persons.filterPersonsByName, ...state.persons.filterPersonsByAge ]
-    
+    listPersons: commonFromTwoArrays(commontNameAndAge, state.persons.filterPersonsBySex),
+    selectedOption: state.persons.selectedOption,
   };
 }
 
 const mapDispatchToProps = (dispatch) => {
   return {
     getData: url => dispatch(getPersons(url)),
-
-    onFind: (formElement) => {
-      if (formElement.name === 'nameValue'){
-      dispatch(findPersonsByName(formElement))
-      } else if (formElement.name === 'ageValue'){
-        dispatch(findPersonsByAge(formElement))
-      }
-    }
+    onFindName: formElement => dispatch(findPersonsByName(formElement)),
+    onFindAge: formElement => dispatch(findPersonsByAge(formElement)),
+    onFindSex: formElement => dispatch(findPersonsBySex(formElement)),
   }
 }
 
-
+function commonFromTwoArrays(firstArr, secondArr) {
+  return firstArr.filter(item =>
+    secondArr.some(el => item.name === el.name) &&
+    secondArr.some(el => item.age === el.age) &&
+    secondArr.some(el => item.sex === el.sex)
+  );
+}
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);
 
