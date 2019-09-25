@@ -9,7 +9,7 @@ const Search = (props) => {
                     <label htmlFor="nameValue">Поиск за именем или фамилией:
             <input name="nameValue" type="text" onChange={props.onHandleFindName} />
                     </label>
-                    <label htmlFor="nameValue">Поиск за возрастом:
+                    <label htmlFor="ageValue">Поиск за возрастом:
             <input name="ageValue" type="number" onChange={props.onHandleFindAge} />
                     </label>
                 </div>
